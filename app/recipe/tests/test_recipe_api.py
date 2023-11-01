@@ -17,6 +17,7 @@ from recipe.serializers import (
     RecipeDetailSerializer,
 )
 
+
 RECIPES_URL = reverse('recipe:recipe-list')
 
 
@@ -29,7 +30,7 @@ def create_recipe(user, **params):
     """Create and return a sample recipe."""
     defaults = {
         'title': 'Sample recipe title',
-        'time_minutes': 5,
+        'time_minutes': 22,
         'price': Decimal('5.25'),
         'description': 'Sample description',
         'link': 'http://example.com/recipe.pdf',
@@ -42,6 +43,7 @@ def create_recipe(user, **params):
 
 class PublicRecipeAPITests(TestCase):
     """Test unauthenticated API requests."""
+
     def setUp(self):
         self.client = APIClient()
 
@@ -51,13 +53,14 @@ class PublicRecipeAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
+
 class PrivateRecipeApiTests(TestCase):
     """Test authenticated API requests."""
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             'user@example.com',
-            'testpass123'
+            'testpass123',
         )
         self.client.force_authenticate(self.user)
 
@@ -90,7 +93,7 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_get_recipe_detail(self):
-        """Test get recipe detail"""
+        """Test get recipe detail."""
         recipe = create_recipe(user=self.user)
 
         url = detail_url(recipe.id)
@@ -100,11 +103,11 @@ class PrivateRecipeApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_create_recipe(self):
-        """Test creating a recipe"""
+        """Test creating a recipe."""
         payload = {
-        'title': 'Sample recipe',
-        'time_minutes': 30,
-        'price': Decimal('5.99'),
+            'title': 'Sample recipe',
+            'time_minutes': 30,
+            'price': Decimal('5.99'),
         }
         res = self.client.post(RECIPES_URL, payload)
 
@@ -113,5 +116,3 @@ class PrivateRecipeApiTests(TestCase):
         for k, v in payload.items():
             self.assertEqual(getattr(recipe, k), v)
         self.assertEqual(recipe.user, self.user)
-
-
